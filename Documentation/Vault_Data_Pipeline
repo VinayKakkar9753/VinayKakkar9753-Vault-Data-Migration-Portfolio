@@ -1,0 +1,50 @@
+# Vault Data Migration & Validation
+
+## Project Overview
+This project demonstrates end-to-end Autodesk Vault data migration, including extraction, mapping, ETL, and validation. It showcases the skills used in large-scale Vault migrations and highlights expertise in SQL, Power BI, and data-driven process verification.
+
+## Data Pipeline
+The data pipeline consists of:
+
+1. **Extraction** – Data is extracted from Vault tables:
+   - `FileMaster` – stores file metadata
+   - `FileIteration` – stores version and iteration details
+   - `Folder` – folder hierarchy
+   - `Entity` – categories and other associations
+
+2. **Transformation & Mapping**
+   - Map source tables and columns to target system
+   - Validate folder structure, file versions, and category assignments
+   - Identify any inconsistencies before migration
+
+3. **Loading & Verification**
+   - Load transformed data into the target Vault or SaaS platform
+   - Validate using SQL queries to ensure counts, folder mappings, and category associations match the source
+   - Run queries both **before backup** and **after migration** to ensure data integrity
+
+## Key SQL Script
+**File:** `Vault-Queries/01_Vault_FileCount_Validation.sql`
+
+**Purpose:**
+- Count total files in Vault
+- Validate folder mapping and category assignments
+- Serve as a verification step before and after migration
+
+**Instructions:**
+1. Connect to the Vault SQL database (example: `VAULT`)  
+2. Run the script to get file counts and folder/category validation  
+3. Compare results before and after migration
+
+```sql
+-- Example snippet
+SELECT 
+    f.FolderName,
+    fm.TipFileBaseName AS FileName,
+    fi.ModDate,
+    fi.CheckinDate,
+    e.CategoryDefId
+FROM FileMaster fm
+JOIN FileIteration fi ON fm.FileMasterId = fi.FileMasterId
+JOIN Folder f ON fm.FolderId = f.FolderId
+JOIN Entity e ON fm.FileMasterId = e.EntityId
+WHERE fi.IsParsed = 1;
